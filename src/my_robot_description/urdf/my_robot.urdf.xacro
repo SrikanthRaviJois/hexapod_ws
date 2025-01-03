@@ -1,0 +1,128 @@
+<?xml version="1.0"?>
+<robot name="hexapod" xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+  <!-- Base Link -->
+  <link name="base_link">
+    <visual>
+      <geometry>
+        <box size="0.6 0.4 0.1"/>
+      </geometry>
+      <material name="red">
+        <color rgba="1 0 0 1"/>
+      </material>
+    </visual>
+    <collision>
+      <geometry>
+        <box size="0.6 0.4 0.1"/>
+      </geometry>
+    </collision>
+    <inertial>
+      <mass value="5.0"/>
+      <inertia ixx="0.2" ixy="0.0" ixz="0.0" iyy="0.2" iyz="0.0" izz="0.2"/>
+    </inertial>
+  </link>
+
+  <!-- Macro for a single leg -->
+<xacro:macro name="leg" params="leg_name x_offset y_offset hip_color thigh_color shin_color">
+  <!-- Trochanter (Link1) -->
+  <link name="${leg_name}_trochanter">
+    <visual>
+      <geometry>
+        <box size="0.1 0.05 0.05"/>
+      </geometry>
+      <material name="hip_color">
+        <color rgba="${hip_color} 1"/>
+      </material>
+    </visual>
+    <collision>
+      <geometry>
+        <box size="0.1 0.05 0.05"/>
+      </geometry>
+    </collision>
+    <inertial>
+      <mass value="0.2"/>
+      <inertia ixx="0.01" ixy="0.0" ixz="0.0" iyy="0.01" iyz="0.0" izz="0.01"/>
+    </inertial>
+  </link>
+
+  <!-- Hip Joint (q₁) -->
+  <joint name="${leg_name}_hip_joint" type="revolute">
+    <parent link="base_link"/>
+    <child link="${leg_name}_trochanter"/>
+    <origin xyz="${x_offset} ${y_offset} 0.05" rpy="0 0 0"/>
+    <axis xyz="0 0 1"/>
+    <limit effort="5.0" lower="-1.57" upper="1.57" velocity="1.0"/>
+  </joint>
+
+  <!-- Femur (Link2) -->
+  <link name="${leg_name}_femur">
+    <visual>
+      <geometry>
+        <cylinder length="0.2" radius="0.03"/>
+      </geometry>
+      <material name="thigh_color">
+        <color rgba="${thigh_color} 1"/>
+      </material>
+    </visual>
+    <collision>
+      <geometry>
+        <cylinder length="0.2" radius="0.03"/>
+      </geometry>
+    </collision>
+    <inertial>
+      <mass value="0.2"/>
+      <inertia ixx="0.01" ixy="0.0" ixz="0.0" iyy="0.01" iyz="0.0" izz="0.01"/>
+    </inertial>
+  </link>
+
+  <!-- Knee Joint (q₂) -->
+  <joint name="${leg_name}_knee_joint" type="revolute">
+    <parent link="${leg_name}_trochanter"/>
+    <child link="${leg_name}_femur"/>
+    <origin xyz="0.0 0.0 -0.1" rpy="0 0 0"/>
+    <axis xyz="0 1 0"/>
+    <limit effort="5.0" lower="-2.0" upper="2.0" velocity="1.0"/>
+  </joint>
+
+  <!-- Tibia (Link3) -->
+  <link name="${leg_name}_tibia">
+    <visual>
+      <geometry>
+        <cylinder length="0.2" radius="0.03"/>
+      </geometry>
+      <material name="shin_color">
+        <color rgba="${shin_color} 1"/>
+      </material>
+    </visual>
+    <collision>
+      <geometry>
+        <cylinder length="0.2" radius="0.03"/>
+      </geometry>
+    </collision>
+    <inertial>
+      <mass value="0.2"/>
+      <inertia ixx="0.01" ixy="0.0" ixz="0.0" iyy="0.01" iyz="0.0" izz="0.01"/>
+    </inertial>
+  </link>
+
+  <!-- Ankle Joint (q₃) -->
+  <joint name="${leg_name}_ankle_joint" type="revolute">
+    <parent link="${leg_name}_femur"/>
+    <child link="${leg_name}_tibia"/>
+    <origin xyz="0.0 0.0 -0.2" rpy="0 0 0"/>
+    <axis xyz="0 1 0"/>
+    <limit effort="5.0" lower="-2.0" upper="2.0" velocity="1.0"/>
+  </joint>
+</xacro:macro>
+
+
+
+  <!-- Define the six legs -->
+  <xacro:leg leg_name="front_left" x_offset="0.3" y_offset="0.2" hip_color="1 0 0" thigh_color="0 1 0" shin_color="0 0 1"/>
+  <xacro:leg leg_name="front_right" x_offset="0.3" y_offset="-0.2" hip_color="1 0 0" thigh_color="0 1 0" shin_color="0 0 1"/>
+  <xacro:leg leg_name="middle_left" x_offset="0.0" y_offset="0.2" hip_color="1 1 0" thigh_color="1 0 1" shin_color="0 1 1"/>
+  <xacro:leg leg_name="middle_right" x_offset="0.0" y_offset="-0.2" hip_color="1 1 0" thigh_color="1 0 1" shin_color="0 1 1"/>
+  <xacro:leg leg_name="back_left" x_offset="-0.3" y_offset="0.2" hip_color="0 1 1" thigh_color="0 0 1" shin_color="1 1 0"/>
+  <xacro:leg leg_name="back_right" x_offset="-0.3" y_offset="-0.2" hip_color="0 1 1" thigh_color="0 0 1" shin_color="1 1 0"/>
+
+</robot>
